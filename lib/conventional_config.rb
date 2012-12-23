@@ -10,10 +10,15 @@ module ConventionalConfig
 
   class << self
 
-    def generate!
-      Dir["#{conf_path}/#{settings_folder}/**/**.yml"].each do |yaml_file|
-        puts yaml_file
-        generate_class yaml_file
+    def generate!(opts = {})
+      aliases opts[:aliases]       if opts[:aliases]
+      @conf_path = opts[:conf_path] if opts[:conf_path] 
+      
+      unless @loaded
+        Dir["#{conf_path}/#{settings_folder}/**/**.yml"].each do |yaml_file|
+          generate_class yaml_file
+        end
+        @loaded = true
       end
     end
     
@@ -43,7 +48,11 @@ module ConventionalConfig
     end
 
     def conf_path
-      @conf_path ||= Rails.application.config.paths['config'].expanded.first
+      @conf_path ||= if Rails.application
+        Rails.application.config.paths['config'].expanded.first
+      else
+        File.expand_path('../', caller[1])
+      end
     end
   end
 end
