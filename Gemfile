@@ -17,3 +17,5 @@ gem "jquery-rails"
 # gem 'debugger'
 
 gem 'pry'
+
+gem 'rspec-rails', "~> 2.12.0"

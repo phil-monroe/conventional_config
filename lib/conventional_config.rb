@@ -1,59 +1,36 @@
 require 'yaml'
 require 'erb'
+require 'hashie'
 
-require 'conventional_config/settings'
+require 'conventional_config/config'
 require 'conventional_config/engine'
 
 
 module ConventionalConfig
-  DEFAULT_FOLDER = 'settings'
+  def self.generate_classes! paths
+    paths.each do |conf_path|
+      Dir["#{conf_path}/**.yml"].each do |full_path|
+        kname = klass_name(full_path, conf_path)
 
-  class << self
-
-    def generate!(opts = {})
-      aliases opts[:aliases]       if opts[:aliases]
-      @conf_path = opts[:conf_path] if opts[:conf_path] 
-      
-      unless @loaded
-        Dir["#{conf_path}/#{settings_folder}/**/**.yml"].each do |yaml_file|
-          generate_class yaml_file
+        if Configs.constants.include? kname
+          klass = "ConventionalConfig::Configs::#{kname}".constantize
+          klass.path = full_path
+        else
+          Configs.const_set(kname, Config.new(full_path))
         end
-        @loaded = true
-      end
-    end
-    
-    def generate_class file
-      settings = Settings.new(YAML::load(ERB.new(File.read(file)).result(binding)))
-      const_name = File.basename(file).gsub(/\.yml/, "").classify
-        
-      self.class_eval do
-        const_set const_name, settings 
-      end
-    end
-    
-    
 
-    def settings_folder= name
-      @settings_folder = name
-    end
-
-    def settings_folder
-      @settings_folder ||= DEFAULT_FOLDER
-    end
-    
-    def aliases *args
-      args.each do |arg|
-        Kernel.const_set arg.classify, self
       end
     end
 
-    def conf_path
-      @conf_path ||= if Rails.application
-        Rails.application.config.paths['config'].expanded.first
-      else
-        File.expand_path('../', caller[1])
-      end
-    end
+
+  end
+
+  def self.klass_name(full_path, conf_path)
+    name = full_path.gsub(/^#{conf_path}/, '')
+    name.gsub!(/^\//, '')
+    name.gsub!(/\.yml$/, '')
+    name.delete!('.')
+    name.camelize.to_sym
   end
 end
 
