@@ -7,11 +7,11 @@ require "conventional_config/version"
 Gem::Specification.new do |s|
   s.name        = "conventional_config"
   s.version     = ConventionalConfig::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of ConfigGem."
-  s.description = "TODO: Description of ConfigGem."
+  s.authors     = ["Phil Monroe"]
+  s.email       = ["phil@philmonroe.com"]
+  s.homepage    = "https://github.com/phil-monroe/conventional_config"
+  s.summary     = "Better Rails Configuration"
+  s.description = "Better Rails Configuration by auto generating classes to represent YAML configs"
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
